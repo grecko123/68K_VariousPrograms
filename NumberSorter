@@ -1,0 +1,86 @@
+*---------------------------------------------------------------------------------------
+* Program Number: Experiment 12
+* Description : C Program number sort
+* Written by :  Brian and Naera
+* Date : December 9 2009
+*---------------------------------------------------------------------------------------
+* Constant Definitions
+
+NUMVALS 	equ 		10 		; Number of values to be sorted
+INITCNT 	equ 		NUMVALS-2 	; Initial value of countdown
+
+* Data Definitions
+
+		org 		$1000 		; Starting address
+vubSort 	dc.w 		24, 43, 107, -333, 24, 6, 7, 514, 0, -21
+		; Unsigned byte vector to be sorted
+		
+* Program Code
+Start		org	$1200
+		
+
+		move	#255,d1
+		lea	orig,a1
+		move	#0,d0
+		trap	#15
+read		lea	vubsort,a2
+		move	#9,d7
+readlp		move.w	(a2)+,d1
+		cmp	#0,d1
+		blt	negread
+		move	#3,d0
+		trap	#15
+cnt		lea	cma,a1
+		move	#0,d0
+		trap	#15
+		dbra	d7,readlp
+		cmp	#1,d6
+		beq	done
+
+BubSort 	move.w 		#INITCNT,d0 	; Sweep Loop countdown
+SweepLp 	lea 		vubSort,a1 	; Running pointer: beginning of vector
+		move.w		d0,d1
+SwapLp 		move.w 		(a1)+,d2 	; Fetch element & move pointer
+		cmp.w 		(a1),d2 	; Compare elements
+		blt 		NoSwap 		; Preceding <= current: no swap!
+		move.w 		(a1),-2(a1)	; Bump current element 1 position down			
+		move.w 		d2,(a1) 	; Preceding elt. to current position
+NoSwap 		dbf 		d1,Swaplp 	; Next Swap Loop iteration
+		dbf 		d0,SweepLp 	; Next Sweep Loop iteration
+		add		#1,d6		;to set for detection in read sequence
+		clr.l		d1
+		move		#255,d1
+		lea		new,a1
+		move		#0,d0
+		trap		#15
+		bra		read
+		
+		
+done		move	#9,d0
+		trap	#15
+		
+negread		sub.l	#1,d5
+		move.w 	d1,d5
+		move.l	d5,d1
+		move	#3,d0
+		trap	#15
+		clr.l	d1
+		bra	cnt
+		
+		
+***
+orig	dc.b	'Orignal number configuration is:',0
+new	dc.b	'Sorted number configuration is:',0
+cma	dc.b	',',ht
+
+
+
+
+
+
+
+HT  EQU  $09   Tab (horizontal 5 characters)
+
+
+		end 		Start 	
+
